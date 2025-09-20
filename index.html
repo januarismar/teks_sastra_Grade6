@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Belajar Interaktif: Cerita Rakyat, Biografi, Cerpen</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Fancy gradient background animation */
+    .bg-animated {
+      background: radial-gradient(1200px 600px at 10% -10%, #a78bfa55, transparent 60%),
+                  radial-gradient(1000px 800px at 110% 10%, #60a5fa55, transparent 60%),
+                  linear-gradient(135deg, #0ea5e9, #7c3aed);
+      background-attachment: fixed;
+    }
+    .glass {
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      background: rgba(255,255,255,0.10);
+      border: 1px solid rgba(255,255,255,0.18);
+    }
+    .card {
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      background: rgba(255,255,255,0.14);
+      border: 1px solid rgba(255,255,255,0.22);
+      box-shadow: 0 20px 30px rgba(0, 0, 0, 0.15);
+    }
+    .flip {
+      transform-style: preserve-3d;
+      transition: transform 0.5s ease;
+    }
+    .flipped { transform: rotateY(180deg); }
+    .flip-face {
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+    .flip-back { transform: rotateY(180deg); }
+    /* Progress ring animation baseline */
+    .progress-ring__circle {
+      transition: stroke-dashoffset 450ms ease;
+    }
+    /* Buttons micro-interaction */
+    .btn {
+      transition: transform 120ms ease, box-shadow 200ms ease;
+    }
+    .btn:active {
+      transform: translateY(1px);
+    }
+    /* Chip */
+    .chip {
+      transition: background-color 150ms ease, color 150ms ease, transform 150ms ease;
+    }
+    .chip:active { transform: scale(0.98); }
+  </style>
+</head>
+<body class="min-h-screen bg-animated text-white antialiased">
+  <!-- Header -->
+  <header class="sticky top-0 z-30 backdrop-blur bg-black/20 border-b border-white/10">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-white/10 grid place-items-center shadow">
+          <span class="text-2xl">📚</span>
+        </div>
+        <div>
+          <h1 class="text-xl font-semibold">Belajar Interaktif: Teks Cerita</h1>
+          <p class="text-white/70 text-sm">Cerita Rakyat • Biografi • Cerita Pendek</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-4">
+        <!-- Progress ring -->
+        <div class="flex items-center gap-3">
+          <svg width="52" height="52" class="-rotate-90">
+            <circle cx="26" cy="26" r="22" stroke="rgba(255,255,255,0.2)" stroke-width="6" fill="none"/>
+            <circle id="progressCircle" cx="26" cy="26" r="22" stroke="#34d399" stroke-width="6" fill="none" stroke-linecap="round"
+              class="progress-ring__circle" stroke-dasharray="138.2" stroke-dashoffset="138.2"/>
+          </svg>
+          <div class="leading-tight">
+            <div class="text-sm">Kemajuan</div>
+            <div class="text-lg font-bold"><span id="progressPercent">0</span>%</div>
+          </div>
+        </div>
+        <button id="resetBtn" class="btn px-4 py-2 rounded-xl bg-red-500 hover:bg-red-600 shadow hover:shadow-lg">Reset</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="max-w-6xl mx-auto px-4 py-8 grid lg:grid-cols-[320px,1fr] gap-6">
+    <!-- Sidebar -->
+    <aside class="card rounded-2xl p-5 h-max">
+      <h2 class="text-lg font-semibold mb-3">Navigasi</h2>
+      <nav class="space-y-2" id="tabButtons">
+        <button data-tab="rakyat" class="tab-btn btn w-full flex items-center justify-between px-4 py-3 rounded-xl bg-white/10 hover:bg-white/15">
+          <span class="flex items-center gap-2"><span class="text-xl">🏞️</span> Cerita Rakyat</span>
+          <span class="text-white/70 text-sm">Ringkas</span>
+        </button>
+        <button data-tab="biografi" class="tab-btn btn w-full flex items-center justify-between px-4 py-3 rounded-xl hover:bg-white/10">
+          <span class="flex items-center gap-2"><span class="text-xl">🧑‍🏫</span> Biografi</span>
+          <span class="text-white/70 text-sm">Faktual</span>
+        </button>
+        <button data-tab="cerpen" class="tab-btn btn w-full flex items-center justify-between px-4 py-3 rounded-xl hover:bg-white/10">
+          <span class="flex items-center gap-2"><span class="text-xl">✍️</span> Cerita Pendek</span>
+          <span class="text-white/70 text-sm">Ringan</span>
+        </button>
+      </nav>
+
+      <div class="mt-6 border-t border-white/10 pt-5 space-y-3">
+        <h3 class="text-sm uppercase tracking-wide text-white/70">Tugas</h3>
+        <ul class="space-y-2 text-sm">
+          <li class="flex items-center justify-between">
+            <span>Susun Struktur Rakyat</span>
+            <span id="task-struct-rakyat" class="chip text-xs px-2 py-1 rounded-lg bg-white/10">Belum</span>
+          </li>
+          <li class="flex items-center justify-between">
+            <span>Susun Struktur Biografi</span>
+            <span id="task-struct-biografi" class="chip text-xs px-2 py-1 rounded-lg bg-white/10">Belum</span>
+          </li>
+          <li class="flex items-center justify-between">
+            <span>Susun Struktur Cerpen</span>
+            <span id="task-struct-cerpen" class="chip text-xs px-2 py-1 rounded-lg bg-white/10">Belum</span>
+          </li>
+          <li class="flex items-center justify-between">
+            <span>Flashcards</span>
+            <span id="task-flash" class="chip text-xs px-2 py-1 rounded-lg bg-white/10">Belum</span>
+          </li>
+          <li class="flex items-center justify-between">
+            <span>Kuis Akhir</span>
+            <span id="task-quiz" class="chip text-xs px-2 py-1 rounded-lg bg-white/10">Belum</span>
+          </li>
+          <li class="flex items-center justify-between">
+            <span>Klasifikasi Teks</span>
+            <span id="task-classify" class="chip text-xs px-2 py-1 rounded-lg bg-white/10">Belum</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="mt-6 border-t border-white/10 pt-5">
+        <button id="noteBtn" class="btn w-full px-4 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600">Catatan Cepat</button>
+      </div>
+    </aside>
+
+    <!-- Content -->
+    <section class="space-y-6">
+      <!-- Info banner -->
+      <div class="glass rounded-2xl p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-white/10 grid place-items-center"><span>🎯</span></div>
+          <p class="text-white/90">Pelajari ringkasan, susun struktur, kuasai konsep lewat kartu, lalu uji diri dengan kuis.</p>
+        </div>
+        <div class="text-sm text-white/80">Tip: klik tiap tab di kiri untuk berpindah materi</div>
+      </div>
+
+      <!-- Tabs content -->
+      <div id="tabContent" class="space-y-6">
+        <!-- Cerita Rakyat -->
+        <div data-tab-panel="rakyat" class="card rounded-2xl p-6">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <h2 class="text-2xl font-semibold flex items-center gap-2">🏞️ Cerita Rakyat</h2>
+              <p class="text-white/80 mt-2 max-w-3xl">Cerita yang berasal dari masyarakat dahulu, diwariskan secara lisan, sering memuat asal-usul, mitos, atau legenda budaya setempat.</p>
+            </div>
+            <span class="px-3 py-1 rounded-full bg-white/10 text-sm">Ringkasan</span>
+          </div>
+
+          <div class="grid md:grid-cols-2 gap-5 mt-6">
+            <div class="glass rounded-xl p-5">
+              <h3 class="font-semibold mb-2">Ciri-ciri</h3>
+              <ul class="list-disc list-inside space-y-1 text-white/90">
+                <li>Anonim (pengarang tidak diketahui)</li>
+                <li>Turun-temurun</li>
+                <li>Penuh nilai luhur</li>
+                <li>Logika tidak selalu masuk akal (ajaib/supranatural)</li>
+                <li>Banyak versi/variasi</li>
+              </ul>
+            </div>
+            <div class="glass rounded-xl p-5">
+              <h3 class="font-semibold mb-2">Struktur</h3>
+              <ul class="list-disc list-inside space-y-1 text-white/90">
+                <li>Orientasi</li>
+                <li>Komplikasi</li>
+                <li>Resolusi</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Cerita Mini: Cerita Rakyat -->
+          <div class="mt-6 glass rounded-xl p-5">
+            <h3 class="font-semibold mb-3">Contoh Cerita Mini</h3>
+            <details class="rounded-xl overflow-hidden">
+              <summary class="cursor-pointer list-none px-4 py-3 bg-white/10 hover:bg-white/15 rounded-xl flex items-center justify-between">
+                <span>Legenda "Bukit Pelangi"</span>
+                <span class="text-xs px-2 py-1 rounded bg-white/10">Buka/Tutup</span>
+              </summary>
+              <div class="p-4 space-y-3 text-white/90">
+                <div>
+                  <span class="text-xs px-2 py-1 rounded-full bg-emerald-500/80 mr-2">Orientasi</span>
+                  Di sebuah desa yang sering dilanda kemarau, ada bukit gersang tempat anak-anak mencari kayu bakar.
+                </div>
+                <div>
+                  <span class="text-xs px-2 py-1 rounded-full bg-amber-500/80 mr-2">Komplikasi</span>
+                  Suatu hari, seorang anak menolong seekor burung pelangi yang terluka. Warga mengejek karena menilai itu sia-sia.
+                </div>
+                <div>
+                  <span class="text-xs px-2 py-1 rounded-full bg-sky-500/80 mr-2">Resolusi</span>
+                  Burung itu ternyata jelmaan penjaga alam. Ia menghadiahkan hujan warna-warni yang menyuburkan bukit. Sejak itu bukit disebut Bukit Pelangi dan warga diingatkan untuk saling menolong.
+                </div>
+              </div>
+            </details>
+          </div>
+
+          <!-- Order activity -->
+          <div class="mt-6">
+            <h3 class="font-semibold mb-2">Latihan Susun Struktur</h3>
+            <p class="text-white/80 text-sm mb-3">Klik kartu berikut sesuai urutan yang benar. Kartu akan pindah ke “Urutan Anda”.</p>
+            <div class="grid md:grid-cols-2 gap-4">
+              <div class="glass rounded-xl p-4">
+                <div class="text-sm mb-2 text-white/70">Pilih Kartu</div>
+                <div id="rakyat-pool" class="flex flex-wrap gap-2"></div>
+              </div>
+              <div class="glass rounded-xl p-4">
+                <div class="text-sm mb-2 text-white/70 flex items-center justify-between">
+                  <span>Urutan Anda</span>
+                  <button class="btn text-xs px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20" data-action="undo" data-target="rakyat">Urungkan</button>
+                </div>
+                <div id="rakyat-order" class="flex flex-wrap gap-2 min-h-[42px]"></div>
+              </div>
+            </div>
+            <div class="mt-3 flex gap-3">
+              <button class="btn px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600" data-action="check-order" data-target="rakyat">Cek Jawaban</button>
+              <button class="btn px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20" data-action="reset-order" data-target="rakyat">Reset</button>
+              <div id="rakyat-feedback" class="ml-2 text-sm"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Biografi -->
+        <div data-tab-panel="biografi" class="card rounded-2xl p-6 hidden">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <h2 class="text-2xl font-semibold flex items-center gap-2">🧑‍🏫 Biografi</h2>
+              <p class="text-white/80 mt-2 max-w-3xl">Tulisan faktual yang menceritakan riwayat hidup seseorang secara lengkap: kelahiran, pendidikan, karier, pencapaian, dan pengalaman.</p>
+            </div>
+            <span class="px-3 py-1 rounded-full bg-white/10 text-sm">Ringkasan</span>
+          </div>
+
+          <div class="grid md:grid-cols-2 gap-5 mt-6">
+            <div class="glass rounded-xl p-5">
+              <h3 class="font-semibold mb-2">Ciri-ciri</h3>
+              <ul class="list-disc list-inside space-y-1 text-white/90">
+                <li>Faktual dan dapat dipertanggungjawabkan</li>
+                <li>Ada masalah dan solusi</li>
+                <li>Bahasa lugas dan jelas</li>
+                <li>Kronologis (berdasarkan waktu)</li>
+              </ul>
+            </div>
+            <div class="glass rounded-xl p-5">
+              <h3 class="font-semibold mb-2">Pola Umum</h3>
+              <ul class="list-disc list-inside space-y-1 text-white/90">
+                <li>Masa kecil</li>
+                <li>Pendidikan</li>
+                <li>Karier & Pencapaian</li>
+                <li>Tantangan & Solusi</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Cerita Mini: Biografi (fiktif namun bergaya faktual) -->
+          <div class="mt-6 glass rounded-xl p-5">
+            <h3 class="font-semibold mb-3">Contoh Biografi Mini</h3>
+            <details class="rounded-xl overflow-hidden">
+              <summary class="cursor-pointer list-none px-4 py-3 bg-white/10 hover:bg-white/15 rounded-xl flex items-center justify-between">
+                <span>Raka Pratama — Penemu Filter Air Desa</span>
+                <span class="text-xs px-2 py-1 rounded bg-white/10">Buka/Tutup</span>
+              </summary>
+              <div class="p-4 space-y-3 text-white/90">
+                <div>
+                  <span class="text-xs px-2 py-1 rounded-full bg-white/20 mr-2">Masa kecil</span>
+                  Lahir di 2002 di tepi sungai keruh, Raka kecil terbiasa melihat warga kesulitan air bersih.
+                </div>
+                <div>
+                  <span class="text-xs px-2 py-1 rounded-full bg-white/20 mr-2">Pendidikan</span>
+                  Di SMA, ia aktif di klub sains dan membuat percobaan sederhana pemurni air dari arang tempurung.
+                </div>
+                <div>
+                  <span class="text-xs px-2 py-1 rounded-full bg-white/20 mr-2">Tantangan</span>
+                  Prototipe awal gagal menyaring bau. Ia mengajukan pertanyaan ke dosen tamu dan memperbaiki desain.
+                </div>
+                <div>
+                  <span class="text-xs px-2 py-1 rounded-full bg-white/20 mr-2">Pencapaian</span>
+                  Di usia 18, Raka memimpin tim remaja memasang filter murah di 30 rumah. Kasus diare menurun drastis.
+                </div>
+              </div>
+            </details>
+          </div>
+
+          <!-- Order activity -->
+          <div class="mt-6">
+            <h3 class="font-semibold mb-2">Latihan Urut Kronologi</h3>
+            <p class="text-white/80 text-sm mb-3">Klik sesuai urutan yang tepat (awal → akhir).</p>
+            <div class="grid md:grid-cols-2 gap-4">
+              <div class="glass rounded-xl p-4">
+                <div class="text-sm mb-2 text-white/70">Pilih Kartu</div>
+                <div id="biografi-pool" class="flex flex-wrap gap-2"></div>
+              </div>
+              <div class="glass rounded-xl p-4">
+                <div class="text-sm mb-2 text-white/70 flex items-center justify-between">
+                  <span>Urutan Anda</span>
+                  <button class="btn text-xs px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20" data-action="undo" data-target="biografi">Urungkan</button>
+                </div>
+                <div id="biografi-order" class="flex flex-wrap gap-2 min-h-[42px]"></div>
+              </div>
+            </div>
+            <div class="mt-3 flex gap-3">
+              <button class="btn px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600" data-action="check-order" data-target="biografi">Cek Jawaban</button>
+              <button class="btn px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20" data-action="reset-order" data-target="biografi">Reset</button>
+              <div id="biografi-feedback" class="ml-2 text-sm"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cerita Pendek -->
+        <div data-tab-panel="cerpen" class="card rounded-2xl p-6 hidden">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <h2 class="text-2xl font-semibold flex items-center gap-2">✍️ Cerita Pendek (Cerpen)</h2>
+              <p class="text-white/80 mt-2 max-w-3xl">Karangan fiksi yang singkat dan padat, fokus pada satu/ beberapa peristiwa dengan jumlah tokoh terbatas dan alur sederhana.</p>
+            </div>
+            <span class="px-3 py-1 rounded-full bg-white/10 text-sm">Ringkasan</span>
+          </div>
+
+          <div class="grid md:grid-cols-2 gap-5 mt-6">
+            <div class="glass rounded-xl p-5">
+              <h3 class="font-semibold mb-2">Ciri-ciri</h3>
+              <ul class="list-disc list-inside space-y-1 text-white/90">
+                <li>Singkat dan padat</li>
+                <li>Jumlah tokoh terbatas</li>
+                <li>Latar dan alur sederhana</li>
+                <li>Mengandung amanat</li>
+              </ul>
+            </div>
+            <div class="glass rounded-xl p-5">
+              <h3 class="font-semibold mb-2">Struktur</h3>
+              <ul class="list-disc list-inside space-y-1 text-white/90">
+                <li>Abstrak (opsional)</li>
+                <li>Orientasi</li>
+                <li>Komplikasi</li>
+                <li>Evaluasi</li>
+                <li>Resolusi</li>
+                <li>Koda</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Cerita Mini: Cerpen -->
+          <div class="mt-6 glass rounded-xl p-5">
+            <h3 class="font-semibold mb-3">Contoh Cerpen Mini</h3>
+            <details class="rounded-xl overflow-hidden">
+              <summary class="cursor-pointer list-none px-4 py-3 bg-white/10 hover:bg-white/15 rounded-xl flex items-center justify-between">
+                <span>"Tiket Terakhir"</span>
+                <span class="text-xs px-2 py-1 rounded bg-white/10">Buka/Tutup</span>
+              </summary>
+              <div class="p-4 space-y-3 text-white/90">
+                <div>
+                  <span class="text-xs px-2 py-1 rounded-full bg-emerald-500/80 mr-2">Abstrak</span>
+                  Riko ingin pulang tepat waktu, tapi satu-satunya bus hampir berangkat.
+                </div>
+                <div>
+                  <span class="text-xs px-2 py-1 rounded-full bg-white/20 mr-2">Orientasi</span>
+                  Di terminal kecil yang riuh, Riko merogoh saku dan hanya menemukan uang pas.
+                </div>
+                <div>
+                  <span class="text-xs px-2 py-1 rounded-full bg-amber-500/80 mr-2">Komplikasi</span>
+                  Seorang nenek kehilangan dompetnya. Riko ragu: mengejar bus atau menolong.
+                </div>
+                <div>
+                  <span class="text-xs px-2 py-1 rounded-full bg-violet-500/80 mr-2">Evaluasi</span>
+                  Ia memilih menolong dan menemukan dompet di bawah bangku.
+                </div>
+                <div>
+                  <span class="text-xs px-2 py-1 rounded-full bg-sky-500/80 mr-2">Resolusi</span>
+                  Nenek itu memintanya naik taksi yang kebetulan lewat dan membayar ongkosnya.
+                </div>
+                <div>
+                  <span class="text-xs px-2 py-1 rounded-full bg-rose-500/80 mr-2">Koda</span>
+                  Riko sampai lebih cepat dari bus. Ia tersenyum: kebaikan tidak pernah membuatnya terlambat.
+                </div>
+              </div>
+            </details>
+          </div>
+
+          <!-- Order activity -->
+          <div class="mt-6">
+            <h3 class="font-semibold mb-2">Latihan Urut Struktur Cerpen</h3>
+            <p class="text-white/80 text-sm mb-3">Pilih sesuai urutan tepat dari awal hingga penutup.</p>
+            <div class="grid md:grid-cols-2 gap-4">
+              <div class="glass rounded-xl p-4">
+                <div class="text-sm mb-2 text-white/70">Pilih Kartu</div>
+                <div id="cerpen-pool" class="flex flex-wrap gap-2"></div>
+              </div>
+              <div class="glass rounded-xl p-4">
+                <div class="text-sm mb-2 text-white/70 flex items-center justify-between">
+                  <span>Urutan Anda</span>
+                  <button class="btn text-xs px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20" data-action="undo" data-target="cerpen">Urungkan</button>
+                </div>
+                <div id="cerpen-order" class="flex flex-wrap gap-2 min-h-[42px]"></div>
+              </div>
+            </div>
+            <div class="mt-3 flex gap-3">
+              <button class="btn px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600" data-action="check-order" data-target="cerpen">Cek Jawaban</button>
+              <button class="btn px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20" data-action="reset-order" data-target="cerpen">Reset</button>
+              <div id="cerpen-feedback" class="ml-2 text-sm"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Flashcards -->
+        <div class="card rounded-2xl p-6">
+          <div class="flex items-center justify-between">
+            <h2 class="text-xl font-semibold">Kartu Pintar (Flashcards)</h2>
+            <button id="markFlashDone" class="btn text-sm px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600">Tandai Selesai</button>
+          </div>
+          <p class="text-white/80 text-sm mt-1">Klik kartu untuk membalik. Gunakan panah untuk berpindah.</p>
+
+          <div class="mt-4 grid md:grid-cols-[1fr,220px] gap-6">
+            <div class="relative">
+              <div id="flashCard" class="flip card rounded-2xl p-8 h-64 grid place-items-center cursor-pointer select-none">
+                <div class="flip-face absolute inset-0 grid place-items-center p-8">
+                  <div id="flashFront" class="text-center text-lg leading-relaxed"></div>
+                </div>
+                <div class="flip-face flip-back absolute inset-0 grid place-items-center p-8">
+                  <div id="flashBack" class="text-center text-white/90 leading-relaxed"></div>
+                </div>
+              </div>
+              <div class="flex items-center justify-between mt-4">
+                <button id="prevFlash" class="btn px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20">Sebelumnya</button>
+                <div class="text-sm text-white/80">Kartu <span id="flashIndex">1</span>/<span id="flashTotal">5</span></div>
+                <button id="nextFlash" class="btn px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20">Berikutnya</button>
+              </div>
+            </div>
+            <div class="glass rounded-2xl p-4">
+              <h3 class="font-semibold mb-2">Daftar Kartu</h3>
+              <div id="flashList" class="space-y-2 max-h-64 overflow-auto pr-1"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Classifier -->
+        <div class="card rounded-2xl p-6">
+          <h2 class="text-xl font-semibold">Klasifikasi: Termasuk Teks Apa?</h2>
+          <p class="text-white/80 text-sm mt-1">Baca cuplikan, lalu pilih apakah itu Cerita Rakyat, Biografi, atau Cerpen.</p>
+          <div id="classifyList" class="mt-4 grid md:grid-cols-3 gap-4"></div>
+          <div class="mt-4 flex gap-3">
+            <button id="checkClassify" class="btn px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600">Cek Jawaban</button>
+            <button id="resetClassify" class="btn px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20">Reset</button>
+            <div id="classifyFeedback" class="text-sm"></div>
+          </div>
+        </div>
+
+        <!-- Quiz -->
+        <div class="card rounded-2xl p-6">
+          <h2 class="text-xl font-semibold">Kuis Akhir</h2>
+          <p class="text-white/80 text-sm mt-1">Pilih jawaban terbaik. Lihat hasil dan pembahasan setelah submit.</p>
+          <form id="quizForm" class="mt-4 space-y-5">
+            <!-- Questions will be injected -->
+          </form>
+          <div class="mt-4 flex flex-wrap items-center gap-3">
+            <button id="submitQuiz" class="btn px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-600">Kumpulkan Jawaban</button>
+            <button id="retryQuiz" class="btn px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 hidden">Ulangi</button>
+            <div id="quizResult" class="text-sm"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Notes Modal -->
+  <div id="noteModal" class="fixed inset-0 hidden items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/60"></div>
+    <div class="card relative z-10 w-full max-w-lg rounded-2xl p-5">
+      <div class="flex items-center justify-between">
+        <h3 class="text-lg font-semibold">Catatan Cepat</h3>
+        <button id="closeNote" class="btn px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20">Tutup</button>
+      </div>
+      <textarea id="noteArea" class="mt-3 w-full h-48 rounded-xl p-4 bg-black/30 border border-white/10 outline-none" placeholder="Tulis poin penting di sini..."></textarea>
+      <div class="mt-4 flex gap-3">
+        <button id="saveNote" class="btn px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600">Simpan</button>
+        <button id="clearNote" class="btn px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20">Bersihkan</button>
+        <div id="noteStatus" class="text-sm"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="max-w-6xl mx-auto px-4 pb-10 pt-4 text-white/70 text-sm">
+    Dibuat oleh Canva Code • Semua interaksi berjalan lokal di perangkat Anda
+  </footer>
+
+  <script>
+    // App state
+    const state = {
+      activeTab: 'rakyat',
+      tasks: {
+        'struct-rakyat': false,
+        'struct-biografi': false,
+        'struct-cerpen': false,
+        'flash': false,
+        'quiz': false,
+        'classify': false
+      },
+      flashIndex: 0,
+      flashSeen: new Set(),
+      classifyAnswers: {},
+      quizAnswered: false
+    };
+
+    // Utilities
+    const $ = sel => document.querySelector(sel);
+    const $$ = sel => document.querySelectorAll(sel);
+
+    // Progress
+    function updateProgress() {
+      const values = Object.values(state.tasks);
+      const done = values.filter(Boolean).length;
+      const total = values.length;
+      const percent = Math.round((done / total) * 100);
+      $('#progressPercent').textContent = percent;
+      const circle = $('#progressCircle');
+      const radius = 22;
+      const circumference = 2 * Math.PI * radius;
+      const offset = circumference * (1 - percent / 100);
+      circle.style.strokeDasharray = circumference.toFixed(1);
+      circle.style.strokeDashoffset = offset.toFixed(1);
+
+      // Update task chips
+      for (const key of Object.keys(state.tasks)) {
+        const el = document.getElementById('task-' + key);
+        if (!el) continue;
+        if (state.tasks[key]) {
+          el.textContent = 'Selesai';
+          el.className = 'chip text-xs px-2 py-1 rounded-lg bg-emerald-500/80 text-white';
+        } else {
+          el.textContent = 'Belum';
+          el.className = 'chip text-xs px-2 py-1 rounded-lg bg-white/10';
+        }
+      }
+      saveLocal();
+    }
+
+    function saveLocal() {
+      try {
+        localStorage.setItem('literasi_state', JSON.stringify({
+          tasks: state.tasks,
+          flashIndex: state.flashIndex,
+          flashSeen: Array.from(state.flashSeen),
+          classifyAnswers: state.classifyAnswers
+        }));
+      } catch {}
+    }
+
+    function loadLocal() {
+      try {
+        const raw = localStorage.getItem('literasi_state');
+        if (!raw) return;
+        const data = JSON.parse(raw);
+        if (data.tasks) Object.assign(state.tasks, data.tasks);
+        if (Number.isInteger(data.flashIndex)) state.flashIndex = data.flashIndex;
+        if (Array.isArray(data.flashSeen)) state.flashSeen = new Set(data.flashSeen);
+        if (data.classifyAnswers) state.classifyAnswers = data.classifyAnswers;
+      } catch {}
+    }
+
+    // Tabs
+    function setActiveTab(tab) {
+      state.activeTab = tab;
+      $$('#tabButtons .tab-btn').forEach(btn => {
+        const isActive = btn.dataset.tab === tab;
+        btn.className = 'tab-btn btn w-full flex items-center justify-between px-4 py-3 rounded-xl ' + (isActive ? 'bg-white/10 hover:bg-white/15' : 'hover:bg-white/10');
+      });
+      $$('[data-tab-panel]').forEach(p => {
+        p.classList.toggle('hidden', p.dataset.tabPanel !== tab);
+      });
+      // Scroll to top of content section for small screens
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Order Activities
+    const orderData = {
+      rakyat: {
+        correct: ['Orientasi','Komplikasi','Resolusi']
+      },
+      biografi: {
+        correct: ['Masa kecil','Pendidikan','Karier & Pencapaian','Tantangan & Solusi']
+      },
+      cerpen: {
+        correct: ['Abstrak','Orientasi','Komplikasi','Evaluasi','Resolusi','Koda']
+      }
+    };
+
+    function initOrderActivity(key) {
+      const pool = document.getElementById(`${key}-pool`);
+      const order = document.getElementById(`${key}-order`);
+      const feedback = document.getElementById(`${key}-feedback`);
+      const correct = orderData[key].correct.slice();
+      const shuffled = correct.slice().sort(() => Math.random() - 0.5);
+      pool.innerHTML = '';
+      order.innerHTML = '';
+      feedback.textContent = '';
+      shuffled.forEach((text, idx) => {
+        const chip = document.createElement('button');
+        chip.type = 'button';
+        chip.className = 'chip px-3 py-2 rounded-full bg-white/10 hover:bg-white/20';
+        chip.textContent = text;
+        chip.dataset.value = text;
+        chip.addEventListener('click', () => {
+          // move to order if not already
+          if ([...order.children].some(c => c.dataset.value === text)) return;
+          const sel = document.createElement('span');
+          sel.className = 'chip px-3 py-2 rounded-full bg-emerald-500/80 text-white';
+          sel.textContent = text;
+          sel.dataset.value = text;
+          order.appendChild(sel);
+        });
+        pool.appendChild(chip);
+      });
+
+      // Buttons
+      const undoBtn = document.querySelector(`[data-action="undo"][data-target="${key}"]`);
+      undoBtn.onclick = () => {
+        if (order.lastElementChild) order.removeChild(order.lastElementChild);
+      };
+      const resetBtn = document.querySelector(`[data-action="reset-order"][data-target="${key}"]`);
+      resetBtn.onclick = () => initOrderActivity(key);
+      const checkBtn = document.querySelector(`[data-action="check-order"][data-target="${key}"]`);
+      checkBtn.onclick = () => {
+        const attempt = [...order.children].map(c => c.dataset.value);
+        if (attempt.length !== correct.length) {
+          feedback.textContent = 'Lengkapi semua kartu terlebih dahulu.';
+          feedback.className = 'text-sm text-amber-300';
+          return;
+        }
+        const ok = attempt.every((v,i)=> v===correct[i]);
+        if (ok) {
+          feedback.textContent = 'Benar! Urutan kamu tepat.';
+          feedback.className = 'text-sm text-emerald-300';
+          // mark task
+          if (key==='rakyat') state.tasks['struct-rakyat'] = true;
+          if (key==='biografi') state.tasks['struct-biografi'] = true;
+          if (key==='cerpen') state.tasks['struct-cerpen'] = true;
+          updateProgress();
+        } else {
+          // show hint
+          let firstWrong = correct.findIndex((v,i)=>attempt[i]!==v);
+          feedback.innerHTML = `Belum tepat. Cek posisi ke-${firstWrong+1}: seharusnya <b>${correct[firstWrong]}</b>.`;
+          feedback.className = 'text-sm text-rose-300';
+        }
+      };
+    }
+
+    // Flashcards
+    const flashcards = [
+      {
+        front: 'Apa itu Cerita Rakyat?',
+        back: 'Cerita dari masyarakat dahulu, diwariskan lisan; sering memuat asal-usul, mitos, atau legenda.'
+      },
+      {
+        front: 'Ciri Cerita Rakyat',
+        back: 'Anonim, turun-temurun, nilai luhur, unsur ajaib, banyak versi.'
+      },
+      {
+        front: 'Apa itu Biografi?',
+        back: 'Tulisan faktual tentang riwayat hidup seseorang secara lengkap dan kronologis.'
+      },
+      {
+        front: 'Ciri Biografi',
+        back: 'Faktual, ada masalah-solusi, bahasa lugas, kronologis.'
+      },
+      {
+        front: 'Apa itu Cerpen?',
+        back: 'Karangan fiksi singkat-padat, fokus pada satu/ beberapa peristiwa, tokoh terbatas, alur sederhana.'
+      }
+    ];
+
+    function renderFlashCard() {
+      const idx = state.flashIndex;
+      const total = flashcards.length;
+      $('#flashIndex').textContent = (idx + 1);
+      $('#flashTotal').textContent = total;
+      $('#flashFront').textContent = flashcards[idx].front;
+      $('#flashBack').textContent = flashcards[idx].back;
+      $('#flashCard').classList.remove('flipped');
+      // mark seen
+      state.flashSeen.add(idx);
+      renderFlashList();
+      saveLocal();
+    }
+
+    function renderFlashList() {
+      const list = $('#flashList');
+      list.innerHTML = '';
+      flashcards.forEach((f, i) => {
+        const row = document.createElement('button');
+        row.type = 'button';
+        row.className = 'w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 flex items-center justify-between';
+        const left = document.createElement('div');
+        left.innerHTML = `<div class="font-medium">${f.front}</div><div class="text-xs text-white/70 line-clamp-1">${f.back}</div>`;
+        const right = document.createElement('span');
+        right.className = 'text-xs px-2 py-1 rounded bg-white/10';
+        right.textContent = state.flashSeen.has(i) ? 'Dibaca' : 'Baru';
+        row.append(left, right);
+        row.addEventListener('click', () => { state.flashIndex = i; renderFlashCard(); });
+        list.appendChild(row);
+      });
+    }
+
+    // Classifier
+    const classifyItems = [
+      {
+        text: 'Kisah menjelaskan asal-usul sebuah danau yang dipercaya terbentuk dari kutukan.',
+        answer: 'Cerita Rakyat'
+      },
+      {
+        text: 'Riwayat hidup ilmuwan dari masa kecil hingga menemukan penemuan penting.',
+        answer: 'Biografi'
+      },
+      {
+        text: 'Kisah fiksi tentang seorang siswa yang kehilangan bus dan mendapat pelajaran moral.',
+        answer: 'Cerpen'
+      }
+    ];
+    function renderClassifier() {
+      const wrap = $('#classifyList');
+      wrap.innerHTML = '';
+      classifyItems.forEach((item, idx) => {
+        const card = document.createElement('div');
+        card.className = 'glass rounded-2xl p-4 flex flex-col gap-3';
+        const p = document.createElement('p');
+        p.className = 'text-white/90';
+        p.textContent = item.text;
+        const choices = document.createElement('div');
+        choices.className = 'grid grid-cols-1 gap-2';
+        ['Cerita Rakyat','Biografi','Cerpen'].forEach(label => {
+          const btn = document.createElement('button');
+          btn.type='button';
+          btn.className = 'btn px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-left';
+          btn.textContent = label;
+          btn.addEventListener('click', () => {
+            state.classifyAnswers[idx] = label;
+            [...choices.children].forEach(c => c.className = 'btn px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-left');
+            btn.className = 'btn px-3 py-2 rounded-xl bg-emerald-500/80 hover:bg-emerald-500/80';
+          });
+          choices.appendChild(btn);
+        });
+        const feedback = document.createElement('div');
+        feedback.className = 'text-sm';
+        feedback.id = `classify-fb-${idx}`;
+        card.append(p, choices, feedback);
+        wrap.appendChild(card);
+      });
+    }
+
+    // Quiz
+    const quizData = [
+      {
+        q: 'Pernyataan yang paling tepat tentang Cerita Rakyat adalah...',
+        options: [
+          'Ditulis oleh penulis terkenal dan selalu logis.',
+          'Berasal dari masyarakat, diwariskan lisan, dan sering mengandung unsur ajaib.',
+          'Selalu memiliki satu versi resmi yang baku.',
+          'Tidak pernah mengandung nilai moral.'
+        ],
+        a: 1,
+        exp: 'Cerita rakyat berkembang di masyarakat secara lisan dan sering memuat unsur supranatural serta nilai-nilai luhur.'
+      },
+      {
+        q: 'Teks yang menceritakan riwayat hidup seseorang secara faktual dan kronologis adalah...',
+        options: ['Cerpen', 'Biografi', 'Cerita Rakyat', 'Puisi'],
+        a: 1,
+        exp: 'Biografi bersifat faktual dan disusun berdasarkan urutan waktu kehidupan tokoh.'
+      },
+      {
+        q: 'Ciri utama cerpen adalah...',
+        options: [
+          'Tokoh sangat banyak dengan alur kompleks',
+          'Fokus pada satu/ beberapa peristiwa penting dan singkat',
+          'Selalu berdasarkan kisah nyata',
+          'Tanpa pesan moral'
+        ],
+        a: 1,
+        exp: 'Cerpen singkat, padat, tokoh terbatas, dan biasanya menyampaikan amanat.'
+      },
+      {
+        q: 'Urutan struktur yang tepat untuk Cerita Rakyat adalah...',
+        options: [
+          'Komplikasi → Orientasi → Resolusi',
+          'Orientasi → Resolusi → Komplikasi',
+          'Orientasi → Komplikasi → Resolusi',
+          'Resolusi → Orientasi → Komplikasi'
+        ],
+        a: 2,
+        exp: 'Umumnya diawali pengenalan (orientasi), muncul konflik (komplikasi), lalu penyelesaian (resolusi).'
+      },
+      {
+        q: 'Bahasa pada biografi biasanya...',
+        options: ['Puitis dan rumit', 'Lugas dan jelas', 'Banyak majas hiperbola', 'Tidak memperhatikan kaidah'],
+        a: 1,
+        exp: 'Biografi disajikan dengan bahasa yang lugas agar mudah dipahami.'
+      },
+      {
+        q: 'Bagian penutup berisi pesan moral dalam cerpen disebut...',
+        options: ['Orientasi', 'Evaluasi', 'Koda', 'Abstrak'],
+        a: 2,
+        exp: 'Koda adalah bagian penutup yang memuat amanat atau pesan.'
+      },
+      {
+        q: 'Urutan struktur lengkap yang tepat untuk cerpen adalah...',
+        options: [
+          'Orientasi → Komplikasi → Resolusi',
+          'Abstrak → Orientasi → Komplikasi → Evaluasi → Resolusi → Koda',
+          'Komplikasi → Orientasi → Evaluasi → Resolusi',
+          'Orientasi → Evaluasi → Komplikasi → Koda'
+        ],
+        a: 1,
+        exp: 'Struktur cerpen yang lengkap: Abstrak (opsional), Orientasi, Komplikasi, Evaluasi, Resolusi, lalu Koda.'
+      },
+      {
+        q: 'Manakah yang BUKAN ciri biografi?',
+        options: [
+          'Faktual dan dapat dipertanggungjawabkan',
+          'Mengandung unsur ajaib dan banyak versi',
+          'Bahasa lugas dan jelas',
+          'Disusun secara kronologis'
+        ],
+        a: 1,
+        exp: 'Unsur ajaib dan banyak versi lebih tepat untuk cerita rakyat, bukan biografi.'
+      },
+      {
+        q: 'Cerita rakyat umumnya bersifat...',
+        options: ['Individual dan berpenulis jelas', 'Anonim dan kolektif', 'Dokumenter resmi pemerintah', 'Hanya ada satu versi'],
+        a: 1,
+        exp: 'Cerita rakyat anonim (pengarang tak diketahui) dan berkembang secara kolektif di masyarakat.'
+      },
+      {
+        q: 'Tujuan bagian Koda dalam cerpen adalah...',
+        options: ['Memperkenalkan tokoh', 'Menyampaikan konflik utama', 'Memberi pesan/amanat', 'Menjelaskan latar waktu'],
+        a: 2,
+        exp: 'Koda berfungsi menutup cerita dengan amanat atau pesan moral.'
+      },
+      {
+        q: 'Setelah bagian pendidikan, bagian yang lazim dibahas dalam biografi adalah...',
+        options: ['Latar tempat', 'Karier & Pencapaian', 'Koda', 'Evaluasi'],
+        a: 1,
+        exp: 'Biografi biasanya berlanjut ke perjalanan karier dan pencapaian setelah pendidikan.'
+      },
+      {
+        q: 'Contoh yang paling tepat untuk cerpen adalah...',
+        options: [
+          'Ulasan ilmiah proses fotosintesis',
+          'Kisah fiksi singkat tentang siswa yang hampir ketinggalan bus dan belajar arti menolong',
+          'Riwayat hidup presiden dari lahir hingga wafat',
+          'Dokumen peraturan lalu lintas'
+        ],
+        a: 1,
+        exp: 'Cerpen adalah kisah fiksi singkat, fokus pada satu/ beberapa peristiwa dengan amanat.'
+      },
+      {
+        q: 'Mengapa cerita rakyat dapat memiliki banyak versi?',
+        options: [
+          'Karena diturunkan secara lisan sehingga terjadi variasi dalam penuturan',
+          'Karena selalu ditulis ulang oleh penulis terkenal',
+          'Karena dilarang dicetak',
+          'Karena memakai bahasa ilmiah'
+        ],
+        a: 0,
+        exp: 'Transmisi lisan memudahkan perubahan kecil yang lama-lama menjadi versi berbeda.'
+      },
+      {
+        q: 'Bagian pengenalan tokoh, latar, dan waktu dalam cerita disebut...',
+        options: ['Komplikasi', 'Orientasi', 'Resolusi', 'Koda'],
+        a: 1,
+        exp: 'Orientasi adalah tahap awal untuk mengenalkan unsur-unsur cerita.'
+      },
+      {
+        q: 'Pernyataan yang tepat tentang alur cerpen adalah...',
+        options: [
+          'Selalu kompleks dan bercabang',
+          'Biasanya sederhana dan fokus',
+          'Harus non-kronologis',
+          'Tidak memiliki konflik'
+        ],
+        a: 1,
+        exp: 'Cerpen cenderung memiliki alur sederhana dan fokus pada inti peristiwa.'
+      },
+      {
+        q: 'Jumlah tokoh dalam cerpen umumnya...',
+        options: ['Sangat banyak', 'Terbatas', 'Selalu dua', 'Tidak ada tokoh'],
+        a: 1,
+        exp: 'Cerpen biasanya menggunakan sedikit tokoh agar cerita tetap padat dan fokus.'
+      }
+    ];
+
+    function renderQuiz() {
+      const form = $('#quizForm');
+      form.innerHTML = '';
+      quizData.forEach((item, idx) => {
+        const box = document.createElement('div');
+        box.className = 'glass rounded-xl p-4';
+        const q = document.createElement('p');
+        q.className = 'font-medium';
+        q.textContent = `${idx+1}. ${item.q}`;
+        const opts = document.createElement('div');
+        opts.className = 'mt-2 grid gap-2';
+        item.options.forEach((opt, oi) => {
+          const label = document.createElement('label');
+          label.className = 'flex items-start gap-3 px-3 py-2 rounded-xl hover:bg-white/10 cursor-pointer';
+          const radio = document.createElement('input');
+          radio.type = 'radio';
+          radio.name = 'q'+idx;
+          radio.value = oi;
+          radio.className = 'mt-1';
+          const span = document.createElement('span');
+          span.textContent = opt;
+          label.append(radio, span);
+          opts.appendChild(label);
+        });
+        const exp = document.createElement('div');
+        exp.id = `exp-${idx}`;
+        exp.className = 'hidden mt-2 text-sm';
+        box.append(q, opts, exp);
+        form.appendChild(box);
+      });
+      $('#quizResult').textContent = '';
+      $('#retryQuiz').classList.add('hidden');
+    }
+
+    function gradeQuiz() {
+      let correct = 0;
+      quizData.forEach((item, idx) => {
+        const chosen = document.querySelector(`input[name="q${idx}"]:checked`);
+        const exp = document.getElementById(`exp-${idx}`);
+        if (!chosen) {
+          exp.textContent = 'Belum menjawab.';
+          exp.className = 'mt-2 text-sm text-amber-300';
+          return;
+        }
+        const pick = parseInt(chosen.value);
+        const isCorrect = pick === item.a;
+        if (isCorrect) correct++;
+        exp.innerHTML = (isCorrect ? 'Benar. ' : 'Kurang tepat. ') + `<span class="text-white/80">${item.exp}</span>`;
+        exp.className = 'mt-2 text-sm ' + (isCorrect ? 'text-emerald-300' : 'text-rose-300');
+        exp.classList.remove('hidden');
+      });
+      const score = Math.round((correct / quizData.length) * 100);
+      $('#quizResult').innerHTML = `Skor kamu: <b>${score}</b> dari 100.`;
+      $('#retryQuiz').classList.remove('hidden');
+      state.tasks['quiz'] = true; // Ditandai selesai setelah submit pertama kali
+      updateProgress();
+    }
+
+    // Notes
+    function loadNotes() {
+      try {
+        const note = localStorage.getItem('literasi_note') || '';
+        $('#noteArea').value = note;
+      } catch {}
+    }
+
+    function saveNotes() {
+      try {
+        localStorage.setItem('literasi_note', $('#noteArea').value || '');
+        const s = $('#noteStatus');
+        s.textContent = 'Tersimpan!';
+        s.className = 'text-sm text-emerald-300';
+        setTimeout(()=>{ s.textContent=''; }, 1500);
+      } catch {}
+    }
+
+    function clearNotes() {
+      try {
+        localStorage.removeItem('literasi_note');
+        $('#noteArea').value = '';
+        const s = $('#noteStatus');
+        s.textContent = 'Dihapus.';
+        s.className = 'text-sm text-amber-300';
+        setTimeout(()=>{ s.textContent=''; }, 1500);
+      } catch {}
+    }
+
+    // Reset all
+    function resetAll() {
+      if (!confirm('Yakin ingin mereset semua progres?')) return;
+      state.tasks = {
+        'struct-rakyat': false,
+        'struct-biografi': false,
+        'struct-cerpen': false,
+        'flash': false,
+        'quiz': false,
+        'classify': false
+      };
+      state.flashIndex = 0;
+      state.flashSeen = new Set();
+      state.classifyAnswers = {};
+      state.quizAnswered = false;
+      renderFlashCard();
+      renderClassifier();
+      renderQuiz();
+      initOrderActivity('rakyat');
+      initOrderActivity('biografi');
+      initOrderActivity('cerpen');
+      try {
+        localStorage.removeItem('literasi_state');
+      } catch {}
+      updateProgress();
+    }
+
+    // Init
+    loadLocal();
+    // Tabs
+    $$('#tabButtons .tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => setActiveTab(btn.dataset.tab));
+    });
+    setActiveTab(state.activeTab || 'rakyat');
+
+    // Init activities
+    initOrderActivity('rakyat');
+    initOrderActivity('biografi');
+    initOrderActivity('cerpen');
+
+    // Flashcards events
+    renderFlashCard();
+    $('#flashCard').addEventListener('click', () => {
+      $('#flashCard').classList.toggle('flipped');
+    });
+    $('#prevFlash').addEventListener('click', () => {
+      state.flashIndex = (state.flashIndex - 1 + flashcards.length) % flashcards.length;
+      renderFlashCard();
+    });
+    $('#nextFlash').addEventListener('click', () => {
+      state.flashIndex = (state.flashIndex + 1) % flashcards.length;
+      renderFlashCard();
+    });
+    $('#markFlashDone').addEventListener('click', () => {
+      state.tasks['flash'] = true;
+      updateProgress();
+    });
+
+    // Classifier events
+    renderClassifier();
+    $('#checkClassify').addEventListener('click', () => {
+      let allAnswered = true;
+      let allCorrect = true;
+      classifyItems.forEach((item, idx) => {
+        const pick = state.classifyAnswers[idx];
+        const fb = document.getElementById(`classify-fb-${idx}`);
+        if (!pick) {
+          allAnswered = false;
+          fb.textContent = 'Belum memilih.';
+          fb.className = 'text-sm text-amber-300';
+          return;
+        }
+        const ok = pick === item.answer;
+        allCorrect = allCorrect && ok;
+        fb.textContent = ok ? 'Benar.' : `Kurang tepat. Jawaban: ${item.answer}.`;
+        fb.className = 'text-sm ' + (ok ? 'text-emerald-300' : 'text-rose-300');
+      });
+      if (!allAnswered) {
+        $('#classifyFeedback').textContent = 'Lengkapi semua pilihan.';
+        $('#classifyFeedback').className = 'text-sm text-amber-300';
+        return;
+      }
+      if (allCorrect) {
+        $('#classifyFeedback').textContent = 'Mantap! Semua benar.';
+        $('#classifyFeedback').className = 'text-sm text-emerald-300';
+        state.tasks['classify'] = true;
+        updateProgress();
+      } else {
+        $('#classifyFeedback').textContent = 'Ada yang belum tepat. Coba lagi ya!';
+        $('#classifyFeedback').className = 'text-sm text-rose-300';
+      }
+    });
+    $('#resetClassify').addEventListener('click', () => {
+      state.classifyAnswers = {};
+      renderClassifier();
+      $('#classifyFeedback').textContent = '';
+    });
+
+    // Quiz events
+    renderQuiz();
+    $('#submitQuiz').addEventListener('click', (e) => {
+      e.preventDefault();
+      gradeQuiz();
+    });
+    $('#retryQuiz').addEventListener('click', (e) => {
+      e.preventDefault();
+      renderQuiz();
+      $('#quizResult').textContent = '';
+      $('#retryQuiz').classList.add('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // Notes modal
+    $('#noteBtn').addEventListener('click', () => {
+      $('#noteModal').classList.remove('hidden');
+      $('#noteModal').classList.add('flex');
+      loadNotes();
+    });
+    $('#closeNote').addEventListener('click', () => {
+      $('#noteModal').classList.add('hidden');
+      $('#noteModal').classList.remove('flex');
+    });
+    $('#saveNote').addEventListener('click', saveNotes);
+    $('#clearNote').addEventListener('click', clearNotes);
+
+    // Reset
+    $('#resetBtn').addEventListener('click', resetAll);
+
+    // First progress draw
+    updateProgress();
+  </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'981fd078939ffd3f',t:'MTc1ODM1NTQ5MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
